@@ -1,9 +1,9 @@
 # bandwhich-parser
-POSIX shell script to parse the output of the bandwhich tool.
+POSIX shell script to parse the output of the `bandwhich` utility:
 
 https://github.com/imsnif/bandwhich
 
-The default CLI "raw" output of bandwhich looks like this:
+The default CLI "raw" output of `bandwhich` looks like this:
 
 ```plaintext
 Refreshing:
