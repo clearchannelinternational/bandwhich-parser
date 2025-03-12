@@ -1,0 +1,49 @@
+name: Build and Package .deb
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install nFPM
+        run: |
+          curl -sSfL https://github.com/goreleaser/nfpm/releases/latest/download/nfpm_$(uname -s)_$(uname -m).tar.gz | tar -xz -C /usr/local/bin
+
+      - name: Calculate Installed Size for foo
+        id: foo_size
+        run: |
+          SIZE=$(du -sk ./foo | awk '{print $1}')
+          echo "FOO_SIZE=$SIZE" >> $GITHUB_ENV
+
+      - name: Calculate Installed Size for foo-parser
+        id: foo_parser_size
+        run: |
+          SIZE=$(du -sk ./foo-parser | awk '{print $1}')
+          echo "FOO_PARSER_SIZE=$SIZE" >> $GITHUB_ENV
+
+      - name: Append Installed Size to `nfpmpkg.yaml`
+        run: |
+          echo "  deb:" >> nfpmpkg.yaml
+          echo "    installed_size: $FOO_SIZE" >> nfpmpkg.yaml
+          echo "  deb:" >> nfpmpkg.yaml
+          echo "    installed_size: $FOO_PARSER_SIZE" >> nfpmpkg.yaml
+
+      - name: Show Updated `nfpmpkg.yaml`
+        run: cat nfpmpkg.yaml
+
+      - name: Build `.deb` Packages
+        run: nfpmpkg --config nfpmpkg.yaml
+
+      - name: Upload `.deb` Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: deb-packages
+          path: "*.deb"

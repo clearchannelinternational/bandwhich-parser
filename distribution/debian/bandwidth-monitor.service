@@ -1,0 +1,15 @@
+[Unit]
+Description=Bandwhich
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+LimitCORE=0
+ExecStart=sh -c 'bandwhich -rcn -u si-bytes | bandwhich-parser.sh --remote --output ilp'
+
+StandardOutput=append:/var/log/network-stats.log
+StandardError=null
+
+[Install]
+WantedBy=multi-user.target
